@@ -52,18 +52,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Init Sensors
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mstepSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+        // TODO Improve handling register and unregister
         mSensorManager.registerListener(this, mstepSensor, SensorManager.SENSOR_DELAY_UI);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mSensorManager.unregisterListener(this);
     }
     @Override
     public void onSensorChanged(SensorEvent event) {
