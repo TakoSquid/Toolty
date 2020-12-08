@@ -1,4 +1,4 @@
-package com.enib.toolty.ui.dashboard;
+package com.enib.toolty.ui.Pedometer;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,17 +14,17 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.enib.toolty.R;
 
-public class DashboardFragment extends Fragment {
+public class PedometerFragment extends Fragment {
 
-    private DashboardViewModel dashboardViewModel;
+    private PedometerViewModel pedometerViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        dashboardViewModel =
-                ViewModelProviders.of(this).get(DashboardViewModel.class);
+        pedometerViewModel =
+                ViewModelProviders.of(this).get(PedometerViewModel.class);
         View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
         final TextView textView = root.findViewById(R.id.text_dashboard);
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        pedometerViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
