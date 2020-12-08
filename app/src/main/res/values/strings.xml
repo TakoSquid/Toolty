@@ -3,4 +3,8 @@
     <string name="title_gps">GPS</string>
     <string name="title_pedometer">Pedometer</string>
     <string name="title_scan">Scanner</string>
+
+    <string name="gps_favourite_title">My favourite contacts</string>
+    <string name="gps_lost_title">You lost your phone ?</string>
+    <string name="gps_lost_button">Geolocate your phone</string>
 </resources>
