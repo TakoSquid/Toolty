@@ -33,7 +33,7 @@ public class PedometerViewModel extends ViewModel {
 
         int delta = amount - mStepReference;
 
-        Log.e("Model", "Called ! Reference : " + mStepReference + " amount : " + amount + " delta : " + delta);
+        Log.d("PedometerModel", "Called ! Reference : " + mStepReference + " amount : " + amount + " delta : " + delta);
 
         mStep.setValue(delta);
     }
