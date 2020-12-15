@@ -45,6 +45,7 @@ public class GPSFragment extends Fragment implements MessageListener {
         GPSViewModel = new ViewModelProvider(requireActivity()).get(GPSViewModel.class);
         root = inflater.inflate(R.layout.fragment_home, container, false);
 
+        // Send a message when user click on the button
         Button btn = root.findViewById(R.id.button);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,6 +54,7 @@ public class GPSFragment extends Fragment implements MessageListener {
             }
         });
 
+        // Update phone number
         final EditText editText = root.findViewById(R.id.lost_phone_number);
         editText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -78,6 +80,7 @@ public class GPSFragment extends Fragment implements MessageListener {
 
     public void sendSMS(String phoneNumber, String msg) {
         final int PERMISSION_REQUEST_CODE = 1;
+        // Request permission
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             if (root.getContext().checkSelfPermission(android.Manifest.permission.SEND_SMS) == PackageManager.
                     PERMISSION_DENIED) {
@@ -85,22 +88,30 @@ public class GPSFragment extends Fragment implements MessageListener {
                 requestPermissions(permissions, PERMISSION_REQUEST_CODE);
             }
         }
+
+        // Send message
         SmsManager smsManager = SmsManager.getDefault();
         smsManager.sendTextMessage(phoneNumber, null, msg, null, null);
+
+        // Show a toast message to confirm
         Toast.makeText(root.getContext(), "SMS sent.", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void messageReceived(SmsMessage message) {
         String code = message.getMessageBody().substring(0,  6);
-        Log.d(TAG, "Code (://gps): " + code);
+
+        // If message contains "://gps" at the beginning
         if (code.equals("://gps"))
         {
             Toast.makeText(root.getContext(), "SMS requesting location received !", Toast.LENGTH_LONG).show();
+
+            // Assert location data are available
             if (GPSViewModel.getLocation().getValue() == null) {
                 Toast.makeText(root.getContext(), "No location data available", Toast.LENGTH_LONG).show();
             }
             else {
+                // Send location data to origin sender
                 String msg = "Longitude: " + GPSViewModel.getLocation().getValue().getLongitude() + ";"
                         + "Latitude :" + GPSViewModel.getLocation().getValue().getLatitude() + ";"
                         + "Altitude :" + GPSViewModel.getLocation().getValue().getAltitude();
