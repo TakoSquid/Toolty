@@ -2,10 +2,14 @@ package com.enib.toolty;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -23,8 +27,10 @@ import android.widget.Toast;
 import com.enib.toolty.ui.Pedometer.PedometerViewModel;
 import com.enib.toolty.listener.MessageListener;
 import com.enib.toolty.listener.SmsListener;
+import com.enib.toolty.ui.gps.GPSViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -35,7 +41,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener {
+public class MainActivity extends AppCompatActivity implements SensorEventListener, LocationListener {
 
     // Pedometer sensors
     private SensorManager mSensorManager;
@@ -44,9 +50,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     // Pedometer ViewModel
     private PedometerViewModel pedometerViewModel;
 
-    final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
+    // GPS location
+    private LocationManager mLocationManager;
+
+    // GPS ViewModel
+    private GPSViewModel gpsViewModel;
+
     final int MY_PERMISSIONS_REQUEST_SMS = 100;
-    IntentFilter filter = new IntentFilter(SMS_RECEIVED);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,9 +66,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    new String[]{
+            ActivityCompat.requestPermissions(this, new String[]{
                             Manifest.permission.READ_SMS,
                             Manifest.permission.RECEIVE_SMS,
                             Manifest.permission.SEND_SMS
@@ -69,9 +77,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    new String[]{
+            ActivityCompat.requestPermissions(this, new String[]{
                             Manifest.permission.ACCESS_FINE_LOCATION,
                             Manifest.permission.ACCESS_COARSE_LOCATION,
                     },
@@ -101,7 +107,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         // TODO Improve handling register and unregister
         mSensorManager.registerListener(this, mstepSensor, SensorManager.SENSOR_DELAY_UI);
+
+        gpsViewModel = new ViewModelProvider(this).get(GPSViewModel.class);
+
+        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
     }
+
     @Override
     public void onSensorChanged(SensorEvent event) {
         if(event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
@@ -113,6 +125,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        Log.d("LOCATION", "Location changed !");
+        gpsViewModel.setLocation(location);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
 
     }
 }

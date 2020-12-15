@@ -24,12 +24,6 @@ public class SmsListener extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         for (final SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
-            String message = "Sender : " + smsMessage.getDisplayOriginatingAddress()
-                    + "Email From: " + smsMessage.getEmailFrom()
-                    + "Email Body: " + smsMessage.getEmailBody()
-                    + "Display message body: " + smsMessage.getDisplayMessageBody()
-                    + "Time in millisecond: " + smsMessage.getTimestampMillis()
-                    + "Message: " + smsMessage.getMessageBody();
             mListener.messageReceived(smsMessage);
         }
     }
