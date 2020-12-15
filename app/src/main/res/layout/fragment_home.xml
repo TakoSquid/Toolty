@@ -17,14 +17,6 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/favourite_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/roboto_medium"
-            android:text="@string/gps_favourite_title"
-            android:textSize="24sp" />
-
-        <TextView
             android:id="@+id/lost_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -38,6 +30,7 @@
             android:layout_height="wrap_content"
             android:autoText="true"
             android:ems="10"
+            android:hint="+44523468751"
             android:inputType="phone" />
 
         <Button

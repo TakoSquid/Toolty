@@ -81,7 +81,6 @@ public class GPSFragment extends Fragment implements MessageListener {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             if (root.getContext().checkSelfPermission(android.Manifest.permission.SEND_SMS) == PackageManager.
                     PERMISSION_DENIED) {
-                Log.d(" permission ", " permission denied to SEND_SMS - requesting it ");
                 String[] permissions = {android.Manifest.permission.SEND_SMS};
                 requestPermissions(permissions, PERMISSION_REQUEST_CODE);
             }

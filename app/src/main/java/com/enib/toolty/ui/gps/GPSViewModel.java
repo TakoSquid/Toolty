@@ -18,7 +18,7 @@ public class GPSViewModel extends ViewModel {
         mLocation = new MutableLiveData<>();
 
         mText.setValue("This is home fragment");
-        mPhoneNumber.setValue("51234");
+        mPhoneNumber.setValue("+44523468751");
     }
 
     public LiveData<String> getText() {
