@@ -7,16 +7,27 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
 import android.net.Uri;
+import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
+import android.os.PersistableBundle;
+import android.util.Log;
+import android.widget.Toast;
 
+import com.enib.toolty.ui.Pedometer.PedometerViewModel;
 import com.enib.toolty.listener.MessageListener;
 import com.enib.toolty.listener.SmsListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
@@ -24,7 +35,14 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
+
+    // Pedometer sensors
+    private SensorManager mSensorManager;
+    private Sensor mstepSensor;
+
+    // Pedometer ViewModel
+    private PedometerViewModel pedometerViewModel;
 
     final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
     final int MY_PERMISSIONS_REQUEST_SMS = 100;
@@ -70,8 +88,31 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+
+
         NavigationUI.setupWithNavController(navView, navController);
 
+        // Init pedometer view model (Activity owns it)
+        pedometerViewModel = new ViewModelProvider(this).get(PedometerViewModel.class);
+
+        // Init Sensors
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mstepSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+
+        // TODO Improve handling register and unregister
+        mSensorManager.registerListener(this, mstepSensor, SensorManager.SENSOR_DELAY_UI);
+    }
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if(event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
+            pedometerViewModel.setStepCounter((int)event.values[0]);
+        }
+
+
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
 }
