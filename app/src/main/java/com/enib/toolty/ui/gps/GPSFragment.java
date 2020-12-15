@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.telephony.SmsManager;
@@ -24,8 +25,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.enib.toolty.MainActivity;
 import com.enib.toolty.R;
 import com.enib.toolty.listener.MessageListener;
 import com.enib.toolty.listener.SmsListener;
@@ -35,13 +38,11 @@ public class GPSFragment extends Fragment implements MessageListener {
     private GPSViewModel GPSViewModel;
     private String TAG = GPSFragment.class.getName();
     private View root;
-    private LocationManager locationManager;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        GPSViewModel =
-                ViewModelProviders.of(this).get(GPSViewModel.class);
+        GPSViewModel = new ViewModelProvider(requireActivity()).get(GPSViewModel.class);
         root = inflater.inflate(R.layout.fragment_home, container, false);
 
         Button btn = root.findViewById(R.id.button);
@@ -72,8 +73,6 @@ public class GPSFragment extends Fragment implements MessageListener {
         });
 
         SmsListener.bindListener(this);
-
-        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         return root;
     }
 
@@ -87,21 +86,27 @@ public class GPSFragment extends Fragment implements MessageListener {
                 requestPermissions(permissions, PERMISSION_REQUEST_CODE);
             }
         }
-
-        Log.d("SMS", "Sending SMS");
         SmsManager smsManager = SmsManager.getDefault();
         smsManager.sendTextMessage(phoneNumber, null, msg, null, null);
         Toast.makeText(root.getContext(), "SMS sent.", Toast.LENGTH_LONG).show();
     }
 
-    @SuppressLint("MissingPermission")
     @Override
     public void messageReceived(SmsMessage message) {
         String code = message.getMessageBody().substring(0,  6);
         Log.d(TAG, "Code (://gps): " + code);
         if (code.equals("://gps"))
         {
-            Log.d(TAG, "Last location:" + locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+            Toast.makeText(root.getContext(), "SMS requesting location received !", Toast.LENGTH_LONG).show();
+            if (GPSViewModel.getLocation().getValue() == null) {
+                Toast.makeText(root.getContext(), "No location data available", Toast.LENGTH_LONG).show();
+            }
+            else {
+                String msg = "Longitude: " + GPSViewModel.getLocation().getValue().getLongitude() + ";"
+                        + "Latitude :" + GPSViewModel.getLocation().getValue().getLatitude() + ";"
+                        + "Altitude :" + GPSViewModel.getLocation().getValue().getAltitude();
+                sendSMS(message.getOriginatingAddress(), "My location is : " + msg);
+            }
         }
     }
 }
