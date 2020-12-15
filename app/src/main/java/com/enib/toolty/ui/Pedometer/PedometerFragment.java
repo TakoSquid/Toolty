@@ -44,6 +44,7 @@ public class PedometerFragment extends Fragment {
             }
         });
 
+        // Reset button creation & callback
         final Button button = root.findViewById(R.id.btn_reset);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

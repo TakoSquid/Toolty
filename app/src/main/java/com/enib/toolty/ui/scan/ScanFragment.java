@@ -36,8 +36,6 @@ public class ScanFragment extends Fragment {
 
     private ScanViewModel scanViewModel;
 
-    private ImageView imageView;
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         scanViewModel = new ViewModelProvider(this).get(ScanViewModel.class);
@@ -45,18 +43,23 @@ public class ScanFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_notifications, container, false);
 
         final Button camBtn = root.findViewById(R.id.camButton);
-        imageView = root.findViewById(R.id.imageView);
 
+        // Callback for the camera button
         camBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                // Creating Intent (from dependency zxing ! Git for this project here : https://github.com/journeyapps/zxing-android-embedded)
                 IntentIntegrator intentIntegrator = IntentIntegrator.forSupportFragment(ScanFragment.this);
 
+                // Configuration
                 intentIntegrator.setOrientationLocked(true);
                 intentIntegrator.setBeepEnabled(false);
                 intentIntegrator.setCaptureActivity(Capture.class);
                 intentIntegrator.setBarcodeImageEnabled(true);
-                intentIntegrator.setPrompt("Scannez un QR code ou un code bar !");
+                intentIntegrator.setPrompt("Scan a QR code or a code bar !");
+
+                // Starting intent !
                 intentIntegrator.initiateScan();
             }
         });
@@ -64,28 +67,35 @@ public class ScanFragment extends Fragment {
         return root;
     }
 
+    // Activity ended callback
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        // Retrieve and parse activity result
         IntentResult intentResult = IntentIntegrator.parseActivityResult(
                 requestCode, resultCode, data
         );
 
+        // If result contains usable content
         if(intentResult.getContents() != null) {
+
+            // Creating a popup with the result
             AlertDialog.Builder builder = new AlertDialog.Builder(
                     getActivity()
             );
 
-            builder.setTitle("Résultat du scan");
+            // Configuration
+            builder.setTitle("Scan result");
             builder.setMessage(intentResult.getContents());
-            builder.setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
                 }
             });
 
+            // Displaying it
             builder.show();
         }
     }
